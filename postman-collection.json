@@ -1,0 +1,385 @@
+{
+  "info": {
+    "name": "AI Productivity Coach API",
+    "description": "Complete Postman collection for all endpoints. Set {{baseUrl}} to http://localhost:8080/api/v1 and {{token}} after login.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" },
+    { "key": "token",   "value": "" }
+  ],
+  "item": [
+
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/signup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Alice Johnson\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"securePass123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.collectionVariables.set('token', json.token);",
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "pm.test('Token present', () => pm.expect(json.token).to.be.a('string'));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"securePass123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.collectionVariables.set('token', json.token);",
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Token present', () => pm.expect(json.token).to.be.a('string'));"
+              ]
+            }
+          }]
+        }
+      ]
+    },
+
+    {
+      "name": "🎯 Goals",
+      "item": [
+        {
+          "name": "Create PRIMARY Goal",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/goals",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Master Data Structures & Algorithms\",\n  \"description\": \"Solve 300 LeetCode problems and land a FAANG offer\",\n  \"priority\": \"PRIMARY\",\n  \"deadline\": \"2025-12-31\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.collectionVariables.set('goalId', json.id);",
+                "pm.test('Status 201', () => pm.response.to.have.status(201));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Create SECONDARY Goal",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/goals",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Read 12 Books This Year\",\n  \"description\": \"One book per month on productivity, software, or personal growth\",\n  \"priority\": \"SECONDARY\",\n  \"deadline\": \"2025-12-31\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Goals",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/goals",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update Goal",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/goals/{{goalId}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Master DSA - Updated\",\n  \"description\": \"Solve 400 LeetCode problems\",\n  \"priority\": \"PRIMARY\",\n  \"deadline\": \"2026-03-31\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Goal",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/goals/{{goalId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "📅 Daily Logs",
+      "item": [
+        {
+          "name": "Create Daily Log",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/logs",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2025-01-15\",\n  \"timeEntries\": [\n    {\n      \"startTime\": \"09:00\",\n      \"endTime\": \"11:00\",\n      \"activity\": \"Solved 5 LeetCode medium problems\",\n      \"category\": \"DSA Practice\",\n      \"productivityScore\": 5\n    },\n    {\n      \"startTime\": \"11:00\",\n      \"endTime\": \"12:00\",\n      \"activity\": \"Team standup and email responses\",\n      \"category\": \"Meetings\",\n      \"productivityScore\": 3\n    },\n    {\n      \"startTime\": \"13:00\",\n      \"endTime\": \"15:30\",\n      \"activity\": \"Built REST API for productivity tracker\",\n      \"category\": \"Coding\",\n      \"productivityScore\": 5\n    },\n    {\n      \"startTime\": \"15:30\",\n      \"endTime\": \"16:30\",\n      \"activity\": \"Scrolled YouTube and Reddit\",\n      \"category\": \"Entertainment\",\n      \"productivityScore\": 1\n    },\n    {\n      \"startTime\": \"17:00\",\n      \"endTime\": \"18:00\",\n      \"activity\": \"Read Clean Code chapter 3\",\n      \"category\": \"Learning\",\n      \"productivityScore\": 4\n    }\n  ]\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.collectionVariables.set('logId', json.id);",
+                "pm.test('Status 201', () => pm.response.to.have.status(201));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Get Log By Date",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/logs/2025-01-15",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update Daily Log",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/logs/{{logId}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2025-01-15\",\n  \"timeEntries\": [\n    {\n      \"startTime\": \"09:00\",\n      \"endTime\": \"12:00\",\n      \"activity\": \"Solved 8 LeetCode problems - trees and graphs\",\n      \"category\": \"DSA Practice\",\n      \"productivityScore\": 5\n    },\n    {\n      \"startTime\": \"13:00\",\n      \"endTime\": \"17:00\",\n      \"activity\": \"Spring Boot backend development\",\n      \"category\": \"Coding\",\n      \"productivityScore\": 5\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Daily Log",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/logs/{{logId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🤖 AI Features",
+      "item": [
+        {
+          "name": "Analyze Day",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ai/analyze/day",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2025-01-15\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Has responseText', () => pm.expect(json.responseText).to.be.a('string'));",
+                "pm.test('Has token usage', () => {",
+                "  pm.expect(json.totalTokens).to.be.a('number');",
+                "  pm.expect(json.promptTokens).to.be.a('number');",
+                "  pm.expect(json.completionTokens).to.be.a('number');",
+                "});"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Weekly Report",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ai/report/weekly",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Has totalProductiveHours', () => pm.expect(json.totalProductiveHours).to.be.a('number'));",
+                "pm.test('Has suggestions', () => pm.expect(json.suggestions).to.be.an('array'));",
+                "pm.test('Has token usage', () => pm.expect(json.totalTokens).to.be.a('number'));"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Chat with AI Coach",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ai/chat",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"I keep losing focus after lunch. I have a primary goal of mastering DSA but I spend too much time on YouTube. What should I do?\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Has AI response', () => pm.expect(json.responseText).to.be.a('string'));",
+                "pm.test('Token tracking works', () => pm.expect(json.totalTokens).to.be.above(0));"
+              ]
+            }
+          }]
+        }
+      ]
+    },
+
+    {
+      "name": "❌ Error Cases",
+      "item": [
+        {
+          "name": "Signup - Duplicate Email",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/signup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Alice Again\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"securePass123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": ["pm.test('Status 409', () => pm.response.to.have.status(409));"]
+            }
+          }]
+        },
+        {
+          "name": "Login - Wrong Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"]
+            }
+          }]
+        },
+        {
+          "name": "Create Second PRIMARY Goal",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/goals",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Another Primary Goal\",\n  \"priority\": \"PRIMARY\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": ["pm.test('Status 400', () => pm.response.to.have.status(400));"]
+            }
+          }]
+        },
+        {
+          "name": "Access Without Token",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/goals"
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"]
+            }
+          }]
+        },
+        {
+          "name": "Validation Error - Missing Fields",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/signup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"123\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                "var json = pm.response.json();",
+                "pm.test('Has validation errors', () => pm.expect(json.validationErrors).to.be.an('array'));"
+              ]
+            }
+          }]
+        }
+      ]
+    }
+
+  ]
+}
